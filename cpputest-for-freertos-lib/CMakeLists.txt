@@ -28,7 +28,7 @@ endif(NOT DEFINED CMS_FREERTOS_KERNEL_TOP_DIR)
 FetchContent_Declare(fake-timers
         GIT_REPOSITORY https://github.com/covemountainsoftware/fake-timers.git
         GIT_TAG        0dd7edd4bfac80d8bede10e6ff7bc651df110ab4 #latest
-        SOURCE_DIR     externals/fake-timers
+        SOURCE_DIR     ${CMS_EXTERNALS_TOP_DIR}/fake-timers
 )
 message("Fetching fake-timers git repository")
 FetchContent_MakeAvailable(fake-timers)
