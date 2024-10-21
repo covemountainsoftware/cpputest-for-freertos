@@ -38,9 +38,12 @@ include_directories(include)
 set(FREERTOS_KERNEL_PATH ${CMS_FREERTOS_KERNEL_TOP_DIR} CACHE INTERNAL "")
 
 add_library(cpputest-for-freertos-lib
-        src/cpputest_freertos_port.cpp)
+        src/cpputest_freertos_task.cpp
+        src/cpputest_freertos_queue.cpp
+        src/cpputest_main.cpp
+)
 
 add_subdirectory(tests)
 
-target_include_directories(cpputest-for-freertos-lib PUBLIC  include)
+target_include_directories(cpputest-for-freertos-lib PUBLIC  include port/include externals/FreeRTOS-Kernel/include)
 
