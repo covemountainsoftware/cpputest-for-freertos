@@ -1,0 +1,5 @@
+include_directories(include)
+add_subdirectory(test)
+add_library(hwLockCtrlService include/hwLockCtrlService.h src/hwLockCtrlService.c)
+target_link_libraries(hwLockCtrlService hwLockCtrl freertos_kernel freertos_config)
+target_include_directories(hwLockCtrlService PUBLIC include)
