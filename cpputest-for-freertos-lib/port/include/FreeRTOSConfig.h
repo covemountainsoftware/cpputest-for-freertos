@@ -366,13 +366,17 @@
  * number of the failing assert (for example, "vAssertCalled( __FILE__, __LINE__ )"
  * or it can simple disable interrupts and sit in a loop to halt all execution
  * on the failing line for viewing in a debugger. */
-#define configASSERT( x )         \
-    if( ( x ) == 0 )              \
-    {                             \
-        taskDISABLE_INTERRUPTS(); \
-        for( ; ; )                \
-        ;                         \
-    }
+
+//cpputest-for-freertos assert called, for unit testing
+void cmsAssertCalled( const char * pcFile, unsigned long ulLine );
+#define configASSERT( x )      \
+    do                         \
+    {                          \
+        if( ( x ) == 0 )       \
+        {                      \
+            cmsAssertCalled( __FILE__, __LINE__ ); \
+        }                                          \
+    } while (0)
 
 /******************************************************************************/
 /* FreeRTOS MPU specific definitions. *****************************************/

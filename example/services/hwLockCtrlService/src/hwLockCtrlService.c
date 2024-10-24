@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <stdatomic.h>
-#include <assert.h>
 #include <stdio.h>
 #include "hwLockCtrlService.h"
 #include "hwLockCtrl.h"
@@ -83,17 +82,17 @@ static HLCS_StateMachineFunc s_stateHistory = NULL;
 void HLCS_Init()
 {
     //ensure Init is being called appropriately
-    assert(s_lockState == HLCS_LOCK_STATE_UNKNOWN);
-    assert(s_thread == NULL);
-    assert(s_eventQueue == NULL);
-    assert(s_stateChangedCallback == NULL);
-    assert(s_selfTestResultCallback == NULL);
-    assert(s_currentState == NULL);
-    assert(s_stateHistory == NULL);
-    assert(s_exitThread == false);
+    configASSERT(s_lockState == HLCS_LOCK_STATE_UNKNOWN);
+    configASSERT(s_thread == NULL);
+    configASSERT(s_eventQueue == NULL);
+    configASSERT(s_stateChangedCallback == NULL);
+    configASSERT(s_selfTestResultCallback == NULL);
+    configASSERT(s_currentState == NULL);
+    configASSERT(s_stateHistory == NULL);
+    configASSERT(s_exitThread == false);
 
     s_eventQueue = xQueueCreate(QueueDepth, sizeof(HLCS_EventTypeT));
-    assert(s_eventQueue != 0);
+    configASSERT(s_eventQueue != 0);
 
     //thread is created in Start()
 }
@@ -119,13 +118,13 @@ void HLCS_Destroy()
 
 void HLCS_Start(ExecutionOptionT option)
 {
-    assert(s_currentState == NULL);
-    assert(s_thread == NULL);
+    configASSERT(s_currentState == NULL);
+    configASSERT(s_thread == NULL);
 
     if (EXECUTION_OPTION_NORMAL == option)
     {
         BaseType_t ok = xTaskCreate(HLCS_Task, "HLCS", 2000, NULL, tskIDLE_PRIORITY+1, &s_thread);
-        assert(ok == pdPASS);
+        configASSERT(ok == pdPASS);
     }
     else
     {
@@ -198,7 +197,7 @@ void HLCS_PushEvent(SignalT sig)
     if (!ok)
     {
         fprintf(stderr, "HLCS queue send failed for sig %d!\n", sig);
-        assert(false);
+        configASSERT(false);
     }
 }
 
@@ -212,7 +211,7 @@ void HLCS_PushUrgentEvent(SignalT sig)
     if (!ok)
     {
         fprintf(stderr, "HLCS queue send failed for sig %d!\n", sig);
-        assert(false);
+        configASSERT(false);
     }
 }
 
