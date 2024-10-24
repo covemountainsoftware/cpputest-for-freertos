@@ -39,3 +39,9 @@ bool HwLockCtrlSelfTest(HwLockCtrlSelfTestResultT* outResult)
         return false;
     }
 }
+
+int32_t HwLockCtrlReadCurrent()
+{
+    printf("%s() executed\n", __FUNCTION__);
+    return 50;
+}

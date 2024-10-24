@@ -33,6 +33,7 @@ SOFTWARE.
 #define ACTIVEOBJECTUNITTESTINGDEMO_HWLOCKCTRL_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,6 +78,12 @@ bool HwLockCtrlUnlock();
  *         false - self test failed to execute.
  */
 bool HwLockCtrlSelfTest(HwLockCtrlSelfTestResultT* outResult);
+
+/**
+ * Reads current draw by the lock.
+ * @return current draw in mA.  Negative number if internal error.
+ */
+int32_t HwLockCtrlReadCurrent();
 
 #ifdef __cplusplus
 }
