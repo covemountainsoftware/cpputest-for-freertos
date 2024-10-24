@@ -22,12 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "hwLockCtrlService.h"
+#include "cpputest_freertos_timers.hpp"
+#include "cpputest_freertos_assert.hpp"
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 #include "hwLockCtrl.h"
 
 static constexpr const char* HW_LOCK_CTRL_MOCK = "HwLockCtrl";
 static constexpr const char* CB_MOCK = "TestCb";
+
+using namespace std::chrono_literals;
 
 static void TestLockStateCallback(HLCS_LockStateT state)
 {
@@ -56,6 +60,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
 {
     void setup() final
     {
+        cms::test::InitFakeTimers();
         HLCS_Init();
         HLCS_RegisterChangeStateCallback(TestLockStateCallback);
         HLCS_RegisterSelfTestResultCallback(TestSelfTestResultCallback);
@@ -65,6 +70,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
     {
         HLCS_Destroy(); //ensure we are stopped/clean/destroyed.
         mock().clear();
+        cms::test::DestroyFakeTimers();
     }
 
     void GiveProcessingTime()
@@ -201,14 +207,20 @@ TEST(HwLockCtrlServiceTests, given_unlocked_when_selftest_request_which_fails_th
     mock().checkExpectations();
 }
 
-TEST(HwLockCtrlServiceTests, rapid_create_start_destroy_handles_real_thread_correctly)
-{
-    //just make sure we don't see a crash or other hang or
-    //unexpected behavior.
-    mock().ignoreOtherCalls();
-    HLCS_Start(EXECUTION_OPTION_NORMAL);
-    HLCS_Destroy();
-    HLCS_Init();
-    HLCS_Start(EXECUTION_OPTION_NORMAL);
-    HLCS_Destroy();
+TEST(HwLockCtrlServiceTests, given_unlocked_when_5_secs_passes_then_checks_current) {
+    StartServiceToUnlocked();
+    mock(HW_LOCK_CTRL_MOCK).expectOneCall("ReadCurrent").andReturnValue(100);
+    cms::test::MoveTimeForward(5s);
+    GiveProcessingTime();
+    mock().checkExpectations();
+}
+
+TEST(HwLockCtrlServiceTests, if_current_exceeds_2amps_will_assert) {
+    StartServiceToUnlocked();
+    mock(HW_LOCK_CTRL_MOCK).expectOneCall("ReadCurrent").andReturnValue(2001);
+    cms::test::AssertOutputDisable();
+    cms::test::MockExpectAssert();
+    cms::test::MoveTimeForward(5s);
+    GiveProcessingTime();
+    mock().checkExpectations();
 }

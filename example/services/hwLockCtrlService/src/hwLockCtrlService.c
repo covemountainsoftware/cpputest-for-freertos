@@ -28,6 +28,7 @@ SOFTWARE.
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "timers.h"
 
 typedef enum Signal
 {
@@ -36,6 +37,7 @@ typedef enum Signal
     SIG_REQUEST_LOCKED,
     SIG_REQUEST_UNLOCKED,
     SIG_REQUEST_SELF_TEST,
+    SIG_REQUEST_CURRENT_CHECK,
     SIG_REQUEST_THREAD_EXIT
 } SignalT;
 
@@ -58,6 +60,8 @@ static void* HLCS_SmLocked(const HLCS_EventTypeT* const event);
 static void* HLCS_SmUnlocked(const HLCS_EventTypeT* const event);
 static void* HLCS_SmSelfTest(const HLCS_EventTypeT* const event);
 static void HLCS_Task(void*);
+static void HLCS_CheckCurrentTimerCallback( TimerHandle_t xTimer );
+static void HLCS_DoCurrentCheck();
 
 //constants
 static const size_t QueueDepth = 10;
@@ -74,6 +78,7 @@ static HLCS_ChangeStateCallback s_stateChangedCallback = NULL;
 static HLCS_SelfTestResultCallback s_selfTestResultCallback = NULL;
 static HLCS_StateMachineFunc s_currentState = NULL;
 static HLCS_StateMachineFunc s_stateHistory = NULL;
+static TimerHandle_t s_timer = NULL;
 
 //internal macros for state machine readability
 #define TransitionTo(x) (x)
@@ -85,6 +90,7 @@ void HLCS_Init()
     configASSERT(s_lockState == HLCS_LOCK_STATE_UNKNOWN);
     configASSERT(s_thread == NULL);
     configASSERT(s_eventQueue == NULL);
+    configASSERT(s_timer == NULL);
     configASSERT(s_stateChangedCallback == NULL);
     configASSERT(s_selfTestResultCallback == NULL);
     configASSERT(s_currentState == NULL);
@@ -93,6 +99,10 @@ void HLCS_Init()
 
     s_eventQueue = xQueueCreate(QueueDepth, sizeof(HLCS_EventTypeT));
     configASSERT(s_eventQueue != 0);
+
+    s_timer = xTimerCreate("current", pdMS_TO_TICKS(5000), pdTRUE,
+                           NULL, HLCS_CheckCurrentTimerCallback);
+    configASSERT(s_timer != 0);
 
     //thread is created in Start()
 }
@@ -105,6 +115,11 @@ void HLCS_Destroy()
         HLCS_PushUrgentEvent(SIG_REQUEST_THREAD_EXIT);
         vTaskDelete(s_thread);
         vQueueDelete(s_eventQueue);
+    }
+    if (s_timer != NULL)
+    {
+        xTimerDelete(s_timer, 1000);
+        s_timer = NULL;
     }
     s_lockState = HLCS_LOCK_STATE_UNKNOWN;
     s_eventQueue = NULL;
@@ -130,6 +145,10 @@ void HLCS_Start(ExecutionOptionT option)
     {
         HLCS_SmInitialize();
     }
+
+    BaseType_t rtn = xTimerStart(s_timer, 1000);
+    configASSERT(rtn == pdPASS);
+
 }
 
 HLCS_LockStateT HLCS_GetState()
@@ -284,6 +303,10 @@ void* HLCS_SmLocked(const HLCS_EventTypeT* const event)
     case SIG_REQUEST_SELF_TEST:
         rtn = TransitionTo(HLCS_SmSelfTest);
         break;
+    case SIG_REQUEST_CURRENT_CHECK:
+        HLCS_DoCurrentCheck();
+        rtn = Handled();
+        break;
     default:
         rtn = Handled();
         break;
@@ -314,6 +337,10 @@ void* HLCS_SmUnlocked(const HLCS_EventTypeT* const event)
         break;
     case SIG_REQUEST_SELF_TEST:
         rtn = TransitionTo(HLCS_SmSelfTest);
+        break;
+    case SIG_REQUEST_CURRENT_CHECK:
+        HLCS_DoCurrentCheck();
+        rtn = Handled();
         break;
     default:
         rtn = Handled();
@@ -385,4 +412,15 @@ void HLCS_Task(void* params)
     {
         HLCS_ProcessOneEvent(EXECUTION_OPTION_NORMAL);
     }
+}
+
+void HLCS_CheckCurrentTimerCallback( TimerHandle_t xTimer )
+{
+    HLCS_PushEvent(SIG_REQUEST_CURRENT_CHECK);
+}
+
+void HLCS_DoCurrentCheck()
+{
+    int32_t milliamps = HwLockCtrlReadCurrent();
+    configASSERT(milliamps < 2000);
 }
