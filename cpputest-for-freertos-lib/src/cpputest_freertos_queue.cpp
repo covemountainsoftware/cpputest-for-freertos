@@ -24,12 +24,11 @@
 ///***************************************************************************
 /// @endcond
 
-#include "FreeRTOS.h"
-#include "queue.h"
 #include <deque>
 #include <vector>
 #include <cstring>
-#include <cassert>
+#include "FreeRTOS.h"
+#include "queue.h"
 
 typedef struct QueueDefinition
 {
@@ -52,13 +51,13 @@ QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
 
 void vQueueDelete( QueueHandle_t xQueue )
 {
-    assert(xQueue != nullptr);
+    configASSERT(xQueue != nullptr);
     delete xQueue;
 }
 
 UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue )
 {
-    assert(xQueue != nullptr);
+    configASSERT(xQueue != nullptr);
     return xQueue->queue.size();
 }
 
@@ -66,7 +65,7 @@ BaseType_t xQueueReceive( QueueHandle_t xQueue,
                           void * const pvBuffer,
                           TickType_t xTicksToWait )
 {
-    assert(xQueue != nullptr);
+    configASSERT(xQueue != nullptr);
     (void)xTicksToWait; //in our unit testing fake, never honor ticks to wait.
 
     if (!xQueue->queue.empty())
@@ -93,7 +92,7 @@ BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
                               const BaseType_t xCopyPosition )
 {
     (void)xTicksToWait;
-    assert(xQueue != nullptr);
+    configASSERT(xQueue != nullptr);
 
     if (xQueue->queue.size() >= xQueue->queueLength)
     {
@@ -114,7 +113,7 @@ BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
     }
     else
     {
-        assert(true == false);
+        configASSERT(true == false);
     }
 
     return pdTRUE;
