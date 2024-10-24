@@ -39,10 +39,11 @@ add_library(cpputest-for-freertos-lib
         src/cpputest_freertos_task.cpp
         src/cpputest_freertos_queue.cpp
         src/cpputest_freertos_assert.cpp
+        src/cpputest_freertos_timers.cpp
         src/cpputest_main.cpp
 )
 
 add_subdirectory(tests)
 
 target_include_directories(cpputest-for-freertos-lib PUBLIC  include port/include externals/FreeRTOS-Kernel/include)
-
+target_link_libraries(cpputest-for-freertos-lib fake-timers-lib)
