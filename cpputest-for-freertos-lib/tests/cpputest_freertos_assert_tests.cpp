@@ -37,6 +37,7 @@ TEST_GROUP(AssertTests)
 
 TEST(AssertTests, configASSERT_results_in_expected_mock_hit_and_proper_test_exit)
 {
+    cms::test::AssertOutputDisable();
     cms::test::MockExpectAssert();
     configASSERT(true == false);
     mock().checkExpectations();
