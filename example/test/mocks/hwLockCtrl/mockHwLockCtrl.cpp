@@ -50,3 +50,9 @@ bool HwLockCtrlSelfTest(HwLockCtrlSelfTestResultT* outResult)
     mock(MOCK_NAME).actualCall("SelfTest").withOutputParameter("outResult", outResult);
     return static_cast<bool>(mock(MOCK_NAME).returnIntValueOrDefault(true));
 }
+
+int32_t HwLockCtrlReadCurrent()
+{
+    mock(MOCK_NAME).actualCall("ReadCurrent");
+    return mock(MOCK_NAME).returnIntValueOrDefault(50);
+}
