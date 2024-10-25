@@ -67,7 +67,9 @@ are provided to enable unit testing of assert behavior.
 
 ## Delay
 
-TODO.
+Basic vTaskDelay provided, which will coordinate with the fake timers when used.
+Keeps APIs such xTaskGetTickCount coordinated with fake timers or alternate tick count
+when timers are not being used.
 
 ## Semaphores
 
