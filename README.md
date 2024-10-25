@@ -6,7 +6,15 @@ Copyright Matthew Eshleman
 
 # Introduction
 
-TODO
+CppUTest for FreeRTOS is a host PC based unit testing library supporting
+the unit testing of FreeRTOS based code.
+
+At this time, the library is proven for firmware following an event driven 
+active object pattern, i.e. threads that sit on a queue and process one event 
+at a time. Other patterns may be possible too, as long as the module under test
+does not mix blocking operating system calls within a function being tested. See
+the provided example which provides a back-door for processing a single event,
+which in-turn enables host PC based unit testing.
 
 # Environment
 
@@ -29,11 +37,59 @@ of one of the key benefits of host-based testing of embedded software.
 
 See the configuration at: `.github/workflows/cmake.yml`
 
-
 # Testing Support
 
-TODO
+## Tasks
 
+Non-functional FreeRTOS task related methods are provided for linking purposes only.
+The library assumes that the unit under test will avoid actual threading
+behavior while unit testing. i.e. test the code executed by a thread, NOT 
+threading behavior itself.
+
+## Queues
+
+The library provides fake but functional FreeRTOS compatible queues. The queues
+do not block in any manner.
+
+## Timers
+
+The library provides fake but functional FreeRTOS compatible software timers.
+Accessor methods are provided to allow the unit tests to "move time forward"
+triggers timers to fire as expected.
+
+## ASSERT
+
+The library provides a configured "configASSERT" macro for asserts compatible
+with the FreeRTOS assert method. The assert is mocked and helper methods 
+are provided to enable unit testing of assert behavior.
+
+## Delay
+
+TODO.
+
+## Semaphores
+
+TODO.
+
+## Mutexes
+
+TODO.
+
+## Direct to task notifications
+
+TODO.
+
+## Stream buffers
+
+TODO.
+
+## Message buffers
+
+TODO.
+
+## Event groups
+
+TODO.
 
 # License
 
@@ -43,13 +99,12 @@ Please see LICENSE.txt for details.
 All licenses for external source code and libraries relied upon by this project
 remain fully owned by their respective owners. 
 
-
 # References
 
-This project was also inspired by a generic example, see this blog post:
+This project was inspired by a generic example, see this blog post:
 https://covemountainsoftware.com/2020/04/17/unit-testing-active-objects-and-state-machines/
 
-Additionally, please see that post's associated github repo:
+Additionally, please see that post's associated GitHub repo:
 https://github.com/covemountainsoftware/activeObjectUnitTestingDemo
 
 Other references:
