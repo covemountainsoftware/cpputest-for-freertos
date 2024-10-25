@@ -22,8 +22,8 @@
 /// @endcond
 #include "FreeRTOS.h"
 #include "timers.h"
-#include "CppUTest/TestHarness.h"
 #include "cpputest_freertos_timers.hpp"
+#include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 
 using namespace std::chrono_literals;
