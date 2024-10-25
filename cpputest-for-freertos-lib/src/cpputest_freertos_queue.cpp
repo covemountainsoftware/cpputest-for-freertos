@@ -38,41 +38,45 @@ typedef struct QueueDefinition
     std::deque<std::vector<uint8_t>> queue = {};
 } FakeQueue;
 
-QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength,
-                                   const UBaseType_t uxItemSize,
-                                   const uint8_t ucQueueType )
+extern "C" QueueHandle_t xQueueGenericCreate(const UBaseType_t queueLength,
+                                             const UBaseType_t itemSize,
+                                             const uint8_t queueType)
 {
     auto queue = new FakeQueue();
-    queue->queueLength = uxQueueLength;
-    queue->itemSize = uxItemSize;
-    queue->queueType = ucQueueType;
+    queue->queueLength = queueLength;
+    queue->itemSize = itemSize;
+    queue->queueType = queueType;
     return queue;
 }
 
-void vQueueDelete( QueueHandle_t xQueue )
+extern "C" void vQueueDelete(QueueHandle_t queue)
 {
-    configASSERT(xQueue != nullptr);
-    delete xQueue;
+    configASSERT(queue != nullptr);
+    delete queue;
 }
 
-UBaseType_t uxQueueMessagesWaiting( const QueueHandle_t xQueue )
+extern "C" UBaseType_t uxQueueMessagesWaiting(const QueueHandle_t queue)
 {
-    configASSERT(xQueue != nullptr);
-    return xQueue->queue.size();
+    configASSERT(queue != nullptr);
+    return queue->queue.size();
 }
 
-BaseType_t xQueueReceive( QueueHandle_t xQueue,
-                          void * const pvBuffer,
-                          TickType_t xTicksToWait )
+extern "C" UBaseType_t uxQueueSpacesAvailable(const QueueHandle_t queue)
 {
-    configASSERT(xQueue != nullptr);
-    (void)xTicksToWait; //in our unit testing fake, never honor ticks to wait.
+    configASSERT(queue != nullptr);
+    return queue->queueLength - uxQueueMessagesWaiting(queue);
+}
 
-    if (!xQueue->queue.empty())
+extern "C" BaseType_t xQueueReceive(QueueHandle_t queue, void * const buffer, TickType_t ticks)
+{
+    configASSERT(queue != nullptr);
+    (void)ticks; //in our unit testing fake, never honor ticks to wait.
+
+    if (!queue->queue.empty())
     {
-        auto front = xQueue->queue.front();
-        memcpy(pvBuffer, front.data(), xQueue->itemSize);
-        xQueue->queue.pop_front();
+        auto front = queue->queue.front();
+        memcpy(buffer, front.data(), queue->itemSize);
+        queue->queue.pop_front();
         return pdTRUE;
     }
     else
@@ -81,35 +85,30 @@ BaseType_t xQueueReceive( QueueHandle_t xQueue,
     }
 }
 
-/*
-* @param xCopyPosition Can take the value queueSEND_TO_BACK to place the
-        * item at the back of the queue, or queueSEND_TO_FRONT to place the item
-* at the front of the queue (for high priority messages).
- */
-BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
-                              const void * const pvItemToQueue,
-                              TickType_t xTicksToWait,
-                              const BaseType_t xCopyPosition )
+extern "C" BaseType_t xQueueGenericSend(QueueHandle_t queue,
+                                        const void * const itemToQueue,
+                                        TickType_t ticks,
+                                        const BaseType_t copyPosition )
 {
-    (void)xTicksToWait;
-    configASSERT(xQueue != nullptr);
+    (void)ticks;
+    configASSERT(queue != nullptr);
 
-    if (xQueue->queue.size() >= xQueue->queueLength)
+    if (queue->queue.size() >= queue->queueLength)
     {
         return errQUEUE_FULL;
     }
 
     std::vector<uint8_t> msg;
-    msg.resize(xQueue->itemSize);
-    memcpy(msg.data(), pvItemToQueue, xQueue->itemSize);
+    msg.resize(queue->itemSize);
+    memcpy(msg.data(), itemToQueue, queue->itemSize);
 
-    if (xCopyPosition == queueSEND_TO_BACK)
+    if (copyPosition == queueSEND_TO_BACK)
     {
-        xQueue->queue.push_back(msg);
+        queue->queue.push_back(msg);
     }
-    else if (xCopyPosition == queueSEND_TO_FRONT)
+    else if (copyPosition == queueSEND_TO_FRONT)
     {
-        xQueue->queue.push_front(msg);
+        queue->queue.push_front(msg);
     }
     else
     {
@@ -117,4 +116,21 @@ BaseType_t xQueueGenericSend( QueueHandle_t xQueue,
     }
 
     return pdTRUE;
+}
+
+extern "C" BaseType_t xQueuePeek(QueueHandle_t queue, void * const buffer, TickType_t ticks)
+{
+    configASSERT(queue != nullptr);
+    (void)ticks; //in our unit testing fake, never honor ticks to wait.
+
+    if (!queue->queue.empty())
+    {
+        auto front = queue->queue.front();
+        memcpy(buffer, front.data(), queue->itemSize);
+        return pdTRUE;
+    }
+    else
+    {
+        return pdFALSE;
+    }
 }
