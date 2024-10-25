@@ -2,7 +2,9 @@
 
 Build and Test status: ![Build and Tests](https://github.com/covemountainsoftware/cpputest-for-freertos/actions/workflows/cmake.yml/badge.svg)
 
-Copyright Matthew Eshleman
+Copyright Matthew Eshleman. 
+
+To learn more about Matthew, see here: https://covemountainsoftware.com/services/consulting/
 
 # Introduction
 
