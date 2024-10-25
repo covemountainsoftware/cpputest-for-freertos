@@ -29,7 +29,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-BaseType_t xTaskCreate( TaskFunction_t pxTaskCode,
+extern "C" BaseType_t xTaskCreate( TaskFunction_t pxTaskCode,
                         const char * const pcName,
                         const configSTACK_DEPTH_TYPE uxStackDepth,
                         void * const pvParameters,
@@ -45,7 +45,7 @@ BaseType_t xTaskCreate( TaskFunction_t pxTaskCode,
     return pdPASS;
 }
 
-void vTaskDelete( TaskHandle_t xTaskToDelete )
+extern "C" void vTaskDelete( TaskHandle_t xTaskToDelete )
 {
     (void)xTaskToDelete;
 }
