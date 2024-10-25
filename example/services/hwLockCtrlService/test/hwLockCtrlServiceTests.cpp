@@ -60,7 +60,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
 {
     void setup() final
     {
-        cms::test::InitFakeTimers();
+        cms::test::InitTimers();
         HLCS_Init();
         HLCS_RegisterChangeStateCallback(TestLockStateCallback);
         HLCS_RegisterSelfTestResultCallback(TestSelfTestResultCallback);
@@ -70,7 +70,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
     {
         HLCS_Destroy(); //ensure we are stopped/clean/destroyed.
         mock().clear();
-        cms::test::DestroyFakeTimers();
+        cms::test::DestroyTimers();
     }
 
     void GiveProcessingTime()

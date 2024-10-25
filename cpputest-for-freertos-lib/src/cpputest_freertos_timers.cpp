@@ -7,7 +7,7 @@ namespace test {
 
     static FakeTimers* s_fakeTimers = nullptr;
 
-    void InitFakeTimers()
+    void InitTimers()
     {
         configASSERT(s_fakeTimers == nullptr);
 
@@ -15,7 +15,7 @@ namespace test {
         s_fakeTimers = new FakeTimers(sysTick);
     }
 
-    void DestroyFakeTimers()
+    void DestroyTimers()
     {
         configASSERT(s_fakeTimers != nullptr);
         delete s_fakeTimers;

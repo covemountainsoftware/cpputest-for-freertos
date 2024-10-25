@@ -7,8 +7,8 @@
 namespace cms {
 namespace test {
 
-    void InitFakeTimers();
-    void DestroyFakeTimers();
+    void InitTimers();
+    void DestroyTimers();
     void MoveTimeForward(std::chrono::nanoseconds duration);
 
 } //namespace
