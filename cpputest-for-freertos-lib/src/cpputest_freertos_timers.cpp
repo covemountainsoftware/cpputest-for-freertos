@@ -7,7 +7,7 @@ namespace test {
 
     static FakeTimers* s_fakeTimers = nullptr;
 
-    void InitTimers()
+    void TimersInit()
     {
         configASSERT(s_fakeTimers == nullptr);
 
@@ -15,17 +15,34 @@ namespace test {
         s_fakeTimers = new FakeTimers(sysTick);
     }
 
-    void DestroyTimers()
+    void TimersDestroy()
     {
         configASSERT(s_fakeTimers != nullptr);
         delete s_fakeTimers;
         s_fakeTimers = nullptr;
     }
 
+    bool TimersIsActive()
+    {
+        return s_fakeTimers != nullptr;
+    }
+
     void MoveTimeForward(std::chrono::nanoseconds duration)
     {
         configASSERT(s_fakeTimers != nullptr);
         s_fakeTimers->MoveTimeForward(duration);
+    }
+
+    std::chrono::nanoseconds GetCurrentInternalTime()
+    {
+        if (TimersIsActive())
+        {
+            return s_fakeTimers->GetCurrentInternalTime();
+        }
+        else
+        {
+            return std::chrono::nanoseconds (0);
+        }
     }
 
     std::chrono::nanoseconds TicksToChrono(TickType_t ticks)
@@ -120,15 +137,6 @@ extern "C" BaseType_t xTimerGenericCommandFromTask( TimerHandle_t xTimer,
     }
 
     return pdPASS;
-}
-
-extern "C" TickType_t xTaskGetTickCount(void)
-{
-    configASSERT(s_fakeTimers != nullptr);
-    auto current = s_fakeTimers->GetCurrentInternalTime();
-    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(current);
-
-    return pdMS_TO_TICKS(milliseconds.count());
 }
 
 extern "C" BaseType_t xTimerIsTimerActive( TimerHandle_t xTimer )

@@ -24,6 +24,7 @@ SOFTWARE.
 #include "hwLockCtrlService.h"
 #include "cpputest_freertos_timers.hpp"
 #include "cpputest_freertos_assert.hpp"
+#include "cpputest_freertos_task.hpp"
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 #include "hwLockCtrl.h"
@@ -60,7 +61,8 @@ TEST_GROUP(HwLockCtrlServiceTests)
 {
     void setup() final
     {
-        cms::test::InitTimers();
+        cms::test::TaskInit();
+        cms::test::TimersInit();
         HLCS_Init();
         HLCS_RegisterChangeStateCallback(TestLockStateCallback);
         HLCS_RegisterSelfTestResultCallback(TestSelfTestResultCallback);
@@ -70,7 +72,8 @@ TEST_GROUP(HwLockCtrlServiceTests)
     {
         HLCS_Destroy(); //ensure we are stopped/clean/destroyed.
         mock().clear();
-        cms::test::DestroyTimers();
+        cms::test::TimersDestroy();
+        cms::test::TaskDestroy();
     }
 
     void GiveProcessingTime()

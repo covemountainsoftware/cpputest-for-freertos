@@ -32,12 +32,12 @@ TEST_GROUP(TimersTests)
 {
     void setup() final
     {
-        cms::test::InitTimers();
+        cms::test::TimersInit();
     }
 
     void teardown() final
     {
-        cms::test::DestroyTimers();
+        cms::test::TimersDestroy();
         mock().clear();
     }
 };
