@@ -97,8 +97,8 @@ typedef uint64_t     TickType_t;
 
 #endif /* if ( configNUMBER_OF_CORES == 1 ) */
 
-extern void vPortYield( void );
-#define portYIELD()                                           vPortYield()
+#define portYIELD() do {} while(0)
+#define portYIELD_FROM_ISR(x) do {} while(0)
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */
 #define portTASK_FUNCTION_PROTO( vFunction, pvParameters )    void vFunction( void * pvParameters )

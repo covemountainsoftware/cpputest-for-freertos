@@ -41,6 +41,7 @@ add_library(cpputest-for-freertos-lib
         src/cpputest_freertos_assert.cpp
         src/cpputest_freertos_timers.cpp
         src/cpputest_main.cpp
+        src/cpputest_freertos_semaphore.cpp
 )
 
 add_subdirectory(tests)

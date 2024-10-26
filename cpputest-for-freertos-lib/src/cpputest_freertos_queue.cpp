@@ -24,19 +24,10 @@
 ///***************************************************************************
 /// @endcond
 
-#include <deque>
-#include <vector>
+#include "cpputest_freertos_fake_queue.hpp"
 #include <cstring>
 #include "FreeRTOS.h"
 #include "queue.h"
-
-typedef struct QueueDefinition
-{
-    UBaseType_t queueLength = {};
-    UBaseType_t itemSize = {};
-    uint8_t queueType = {};
-    std::deque<std::vector<uint8_t>> queue = {};
-} FakeQueue;
 
 extern "C" QueueHandle_t xQueueGenericCreate(const UBaseType_t queueLength,
                                              const UBaseType_t itemSize,
