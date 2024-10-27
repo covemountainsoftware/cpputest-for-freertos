@@ -73,7 +73,9 @@ when timers are not being used.
 
 ## Semaphores
 
-TODO.
+Available. The provided fake semaphores do not block, just like the queues.
+See the example ButtonService and its unit tests for a FreeRTOS thread 
+exclusively blocking on a semaphore, triggered from an ISR.
 
 ## Mutexes
 
