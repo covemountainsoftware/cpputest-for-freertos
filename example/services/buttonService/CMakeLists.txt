@@ -1,0 +1,5 @@
+include_directories(include)
+add_subdirectory(test)
+add_library(buttonService include/buttonService.h src/buttonService.c)
+target_link_libraries(buttonService buttonReader freertos_kernel freertos_config)
+target_include_directories(buttonService PUBLIC include)

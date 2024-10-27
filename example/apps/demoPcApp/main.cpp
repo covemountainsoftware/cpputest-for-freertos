@@ -5,6 +5,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "hwLockCtrlService.h"
+#include "buttonService.h"
 
 static HLCS_LockStateT s_lastState = HLCS_LOCK_STATE_UNKNOWN;
 
@@ -54,7 +55,8 @@ DesiredAction GetUserAction()
     std::cout << "0: Unlock the lock" << std::endl;
     std::cout << "1: Lock the lock" << std::endl;
     std::cout << "2: Self Test the lock" << std::endl;
-    std::cout << "3: Exit" << std::endl
+    std::cout << "3: Button ISR" << std::endl;
+    std::cout << "9: Exit" << std::endl
               << std::endl;
 
     while (true) {
@@ -67,6 +69,9 @@ DesiredAction GetUserAction()
             case '2':
                 return DesiredAction::SELF_TEST;
             case '3':
+                ButtonService_SimulateIsr();
+                continue;
+            case '9':
                 return DesiredAction::EXIT;
             default:
                 vTaskDelay(10);
@@ -97,12 +102,23 @@ void UserInputTask(void*)
     }
 }
 
+void ButtonChangeCallback(ButtonFlagT flags, ButtonStateT state, void* context)
+{
+    (void)context;
+    printf("%s(flags = 0x%x, state = %d)\n",
+           __FUNCTION__ , flags, state);
+}
+
 int main()
 {
     HLCS_Init();
     HLCS_RegisterChangeStateCallback(LockStateChangeCallback);
     HLCS_RegisterSelfTestResultCallback(SelfTestResultCallback);
     HLCS_Start(EXECUTION_OPTION_NORMAL);
+
+    ButtonService_Init();
+    ButtonService_RegisterButtonChangeCallback(ButtonChangeCallback, nullptr);
+    ButtonService_Start(EXECUTION_OPTION_NORMAL);
 
     TaskHandle_t input_thread = nullptr;
     BaseType_t ok = xTaskCreate(UserInputTask, "Input", 2000,

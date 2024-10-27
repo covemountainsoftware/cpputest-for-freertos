@@ -1,1 +1,2 @@
 add_subdirectory(hwLockCtrl)
+add_subdirectory(buttonReader)
