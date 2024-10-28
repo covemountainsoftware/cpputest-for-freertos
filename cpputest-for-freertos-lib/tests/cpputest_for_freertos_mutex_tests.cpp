@@ -40,6 +40,7 @@ TEST_GROUP(MutexTests)
         if (mMutexUnderTest != nullptr)
         {
             vSemaphoreDelete(mMutexUnderTest);
+            mMutexUnderTest = nullptr;
         }
     }
 

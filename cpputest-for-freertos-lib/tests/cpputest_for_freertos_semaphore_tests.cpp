@@ -38,6 +38,7 @@ TEST_GROUP(SemaphoreTests)
         if (mSemaUnderTest != nullptr)
         {
             vSemaphoreDelete(mSemaUnderTest);
+            mSemaUnderTest = nullptr;
         }
     }
 

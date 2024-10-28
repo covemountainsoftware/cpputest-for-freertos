@@ -44,6 +44,7 @@ TEST_GROUP(QueueTests)
         {
             //needed for cpputest memory leak detection
             vQueueDelete(mQueueUnderTest);
+            mQueueUnderTest = nullptr;
         }
     }
 
