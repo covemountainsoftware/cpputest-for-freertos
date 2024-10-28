@@ -59,4 +59,7 @@ extern "C" void cmsAssertCalled( const char * file, unsigned long line )
             .withParameter("line", line);
 
     TEST_EXIT;
+
+    //help compiler, which doesn't realize that TEST_EXIT is a no-return
+    for (;;) {}
 }

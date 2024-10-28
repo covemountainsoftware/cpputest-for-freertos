@@ -367,8 +367,12 @@
  * or it can simple disable interrupts and sit in a loop to halt all execution
  * on the failing line for viewing in a debugger. */
 
+#ifdef __cplusplus
 //cpputest-for-freertos assert called, for unit testing
+[[noreturn]] void cmsAssertCalled( const char * pcFile, unsigned long ulLine );
+#else
 void cmsAssertCalled( const char * pcFile, unsigned long ulLine );
+#endif
 #define configASSERT( x )      \
     do                         \
     {                          \
