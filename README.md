@@ -79,7 +79,10 @@ exclusively blocking on a semaphore, triggered from an ISR.
 
 ## Mutexes
 
-TODO.
+Available. The provided fake mutexes do not block, just like the semaphores and queues.
+Additionally, when a unit test is completed, the library confirms that all mutex 
+have been either deleted OR are unlocked. i.e. ensure that a particular test does
+not leave any mutexes in a locked state accidentally.
 
 ## Direct to task notifications
 
