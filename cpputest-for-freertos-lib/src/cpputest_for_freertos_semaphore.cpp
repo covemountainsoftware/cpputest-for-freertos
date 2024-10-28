@@ -33,15 +33,19 @@
 extern "C" BaseType_t xQueueSemaphoreTake(QueueHandle_t queue, TickType_t ticks)
 {
     (void) ticks;  //ignore in cpputest fake semaphore
+    configASSERT(queue != nullptr);
+    configASSERT(queue->queueType != queueQUEUE_TYPE_RECURSIVE_MUTEX);
 
-    uint64_t dummy;
-    return xQueueReceive(queue, &dummy, ticks);
+    return cms::InternalQueueReceive(queue);
 }
 
 
 extern "C" BaseType_t xQueueGiveFromISR(QueueHandle_t queue,
                                         BaseType_t * const pxHigherPriorityTaskWoken)
 {
+    configASSERT(queue != nullptr);
+    configASSERT(queue->queueType != queueQUEUE_TYPE_RECURSIVE_MUTEX);
+
     (void)pxHigherPriorityTaskWoken;
     return xSemaphoreGive(queue);
 }

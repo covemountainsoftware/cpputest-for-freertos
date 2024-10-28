@@ -84,22 +84,22 @@ namespace cms {
     } //namespace
 }//namespace
 
-extern "C" QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType )
+extern "C" QueueHandle_t xQueueCreateMutex(const uint8_t queueType)
 {
-    (void)ucQueueType;
-    auto mutex = xQueueGenericCreate(1, 0, ucQueueType);
-    switch (ucQueueType) {
+    (void)queueType;
+    auto mutex = xQueueGenericCreate(1, 0, queueType);
+    switch (queueType) {
         case queueQUEUE_TYPE_MUTEX:
             //wasn't documented, but in experiment, the standard mutex is created unlocked
             //(i.e) with one token available
             xSemaphoreGive(mutex);
             break;
         case queueQUEUE_TYPE_RECURSIVE_MUTEX:
-            //todo
+            xSemaphoreGive(mutex);
+            mutex->recursiveCallCount = 0;
             break;
         default:
             configASSERT(true == false);
-            break;
     }
     configASSERT(mutex != nullptr);
     if (cms::test::s_mutexes != nullptr)
@@ -108,3 +108,45 @@ extern "C" QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType )
     }
     return mutex;
 }
+
+extern "C" BaseType_t xQueueTakeMutexRecursive(QueueHandle_t mutex,
+                                               TickType_t ticks)
+{
+    (void) ticks; //not used
+
+    configASSERT(mutex != nullptr);
+    configASSERT(mutex->queueType == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+
+    if (1 == uxSemaphoreGetCount(mutex))
+    {
+        auto rtn = cms::InternalQueueReceive(mutex);
+        if (rtn != pdTRUE)
+        {
+            return rtn;
+        }
+    }
+
+    mutex->recursiveCallCount++;
+    return pdTRUE;
+
+}
+
+extern "C" BaseType_t xQueueGiveMutexRecursive(QueueHandle_t mutex)
+{
+    configASSERT(mutex != nullptr);
+    configASSERT(mutex->queueType == queueQUEUE_TYPE_RECURSIVE_MUTEX);
+
+    if (0 == uxSemaphoreGetCount(mutex) && mutex->recursiveCallCount > 0)
+    {
+        mutex->recursiveCallCount--;
+        if (mutex->recursiveCallCount == 0)
+        {
+            return xSemaphoreGive(mutex);
+        }
+
+        return pdTRUE;
+    }
+
+    return pdFALSE;
+}
+

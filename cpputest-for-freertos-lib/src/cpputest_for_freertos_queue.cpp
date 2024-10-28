@@ -67,10 +67,17 @@ extern "C" UBaseType_t uxQueueSpacesAvailable(const QueueHandle_t queue)
     return queue->queueLength - uxQueueMessagesWaiting(queue);
 }
 
-extern "C" BaseType_t xQueueReceive(QueueHandle_t queue, void * const buffer, TickType_t ticks)
+BaseType_t cms::InternalQueueReceive(FakeQueue * queue)
 {
     configASSERT(queue != nullptr);
-    (void)ticks; //in our unit testing fake, never honor ticks to wait.
+
+    uint64_t dummy;
+    return cms::InternalQueueReceive(queue, &dummy);
+}
+
+BaseType_t cms::InternalQueueReceive(FakeQueue * queue, void * const buffer)
+{
+    configASSERT(queue != nullptr);
 
     if (!queue->queue.empty())
     {
@@ -85,10 +92,19 @@ extern "C" BaseType_t xQueueReceive(QueueHandle_t queue, void * const buffer, Ti
     }
 }
 
+extern "C" BaseType_t xQueueReceive(QueueHandle_t queue, void * const buffer, TickType_t ticks)
+{
+    configASSERT(queue != nullptr);
+    configASSERT(buffer != nullptr);
+
+    (void)ticks; //in our unit testing fake, never honor ticks to wait.
+    return cms::InternalQueueReceive(queue, buffer);
+}
+
 extern "C" BaseType_t xQueueGenericSend(QueueHandle_t queue,
                                         const void * const itemToQueue,
                                         TickType_t ticks,
-                                        const BaseType_t copyPosition )
+                                        const BaseType_t copyPosition)
 {
     (void)ticks;
     configASSERT(queue != nullptr);

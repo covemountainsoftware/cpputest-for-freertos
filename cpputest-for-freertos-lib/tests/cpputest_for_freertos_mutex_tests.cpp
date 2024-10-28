@@ -47,6 +47,13 @@ TEST_GROUP(MutexTests)
     void CreateMutex()
     {
         mMutexUnderTest = xSemaphoreCreateMutex();
+        CHECK_TRUE(nullptr != mMutexUnderTest);
+    }
+
+    void CreateRecursiveMutex()
+    {
+        mMutexUnderTest = xSemaphoreCreateRecursiveMutex();
+        CHECK_TRUE(nullptr != mMutexUnderTest);
     }
 };
 
@@ -85,6 +92,58 @@ TEST(MutexTests, library_does_not_detect_locked_mutex_that_was_deleted)
     cms::test::MutexTrackingInit();
     CreateMutex();
     xSemaphoreTake(mMutexUnderTest, 1000);
+    CHECK_TRUE(cms::test::IsAnyMutexLocked());
+
+    vSemaphoreDelete(mMutexUnderTest);
+    mMutexUnderTest = nullptr;
+    CHECK_FALSE(cms::test::IsAnyMutexLocked());
+    cms::test::MutexTrackingTeardown();
+}
+
+TEST(MutexTests, can_create_a_recursive_mutex)
+{
+    CreateRecursiveMutex();
+    CHECK_EQUAL(1, uxSemaphoreGetCount(mMutexUnderTest));
+}
+
+TEST(MutexTests, can_lock_a_recursive_mutex_multiple_times)
+{
+    CreateRecursiveMutex();
+    CHECK_EQUAL(1, uxSemaphoreGetCount(mMutexUnderTest));
+    CHECK_EQUAL(pdTRUE, xSemaphoreTakeRecursive(mMutexUnderTest, 1000));
+    CHECK_EQUAL(pdTRUE, xSemaphoreTakeRecursive(mMutexUnderTest, 1000));
+    CHECK_EQUAL(pdTRUE, xSemaphoreTakeRecursive(mMutexUnderTest, 1000));
+    CHECK_EQUAL(0, uxSemaphoreGetCount(mMutexUnderTest));
+
+    //now confirm give recursive while here
+    CHECK_EQUAL(pdTRUE, xSemaphoreGiveRecursive(mMutexUnderTest));
+    CHECK_EQUAL(0, uxSemaphoreGetCount(mMutexUnderTest));
+    CHECK_EQUAL(pdTRUE, xSemaphoreGiveRecursive(mMutexUnderTest));
+    CHECK_EQUAL(0, uxSemaphoreGetCount(mMutexUnderTest));
+    CHECK_EQUAL(pdTRUE, xSemaphoreGiveRecursive(mMutexUnderTest));
+    CHECK_EQUAL(1, uxSemaphoreGetCount(mMutexUnderTest));
+}
+
+TEST(MutexTests, library_can_detect_locked_recursive_mutexes)
+{
+    CHECK_FALSE(cms::test::IsAnyMutexLocked());
+    cms::test::MutexTrackingInit();
+    CreateRecursiveMutex();
+    CHECK_FALSE(cms::test::IsAnyMutexLocked());
+
+    xSemaphoreTakeRecursive(mMutexUnderTest, 1000);
+    CHECK_TRUE(cms::test::IsAnyMutexLocked());
+
+    xSemaphoreGiveRecursive(mMutexUnderTest);
+    CHECK_FALSE(cms::test::IsAnyMutexLocked());
+    cms::test::MutexTrackingTeardown();
+}
+
+TEST(MutexTests, library_does_not_detect_locked_recursive_mutex_that_was_deleted)
+{
+    cms::test::MutexTrackingInit();
+    CreateRecursiveMutex();
+    xSemaphoreTakeRecursive(mMutexUnderTest, 1000);
     CHECK_TRUE(cms::test::IsAnyMutexLocked());
 
     vSemaphoreDelete(mMutexUnderTest);
