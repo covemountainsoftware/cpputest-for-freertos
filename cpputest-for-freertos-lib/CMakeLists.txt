@@ -42,6 +42,7 @@ add_library(cpputest-for-freertos-lib
         src/cpputest_for_freertos_timers.cpp
         src/cpputest_main.cpp
         src/cpputest_for_freertos_semaphore.cpp
+        src/cpputest_for_freertos_mutex.cpp
         include/cpputest_for_freertos_lib.hpp
 )
 

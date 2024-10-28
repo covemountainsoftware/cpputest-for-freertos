@@ -1,3 +1,28 @@
+/// @brief Provides an implementation of fake but functional
+///        FreeRTOS software timers.
+///
+/// @ingroup
+/// @cond
+///***************************************************************************
+///
+/// Copyright (C) 2024 Matthew Eshleman. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, upon written permission from Matthew Eshleman, this program
+/// may be distributed and modified under the terms of a Commercial
+/// License. For further details, see the Contact Information below.
+///
+/// Contact Information:
+///   Matthew Eshleman
+///   https://covemountainsoftware.com
+///   info@covemountainsoftware.com
+///***************************************************************************
+/// @endcond
+
 #include "FreeRTOS.h"
 #include "timers.h"
 #include "FakeTimers.hpp"

@@ -1,3 +1,30 @@
+/// @brief Provides an implementation of a fake FreeRTOS semaphore
+///        which, like FreeRTOS, is under the hood a queue.
+///        cpputest-for-freertos-lib assumes that a queue should be
+///        functional, i.e. not a mock. No blocking is implemented.
+///
+/// @ingroup
+/// @cond
+///***************************************************************************
+///
+/// Copyright (C) 2024 Matthew Eshleman. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, upon written permission from Matthew Eshleman, this program
+/// may be distributed and modified under the terms of a Commercial
+/// License. For further details, see the Contact Information below.
+///
+/// Contact Information:
+///   Matthew Eshleman
+///   https://covemountainsoftware.com
+///   info@covemountainsoftware.com
+///***************************************************************************
+/// @endcond
+
 #include "cpputest_for_freertos_fake_queue.hpp"
 #include <cstring>
 #include "queue.h"

@@ -27,6 +27,7 @@
 #include "cpputest_for_freertos_assert.hpp"
 #include "cpputest_for_freertos_task.hpp"
 #include "cpputest_for_freertos_timers.hpp"
+#include "cpputest_for_freertos_mutex.hpp"
 
 namespace cms {
     namespace test {
@@ -38,6 +39,7 @@ namespace cms {
             TaskInit();
             AssertOutputEnable();
             TimersInit();
+            MutexTrackingInit();
         }
 
         /**
@@ -45,6 +47,7 @@ namespace cms {
          * destroy/teardown all available CppUTest for FreeRTOS modules.
          */
         void LibTeardownAll() {
+            MutexTrackingTeardown();
             TimersDestroy();
             TaskDestroy();
         }

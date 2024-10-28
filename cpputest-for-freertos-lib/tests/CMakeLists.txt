@@ -6,6 +6,7 @@ set(TEST_SOURCES
         cpputest_for_freertos_queue_tests.cpp
         cpputest_for_freertos_task_tests.cpp
         cpputest_for_freertos_semaphore_tests.cpp
+        cpputest_for_freertos_mutex_tests.cpp
 )
 
 # this include expects TEST_SOURCES and TEST_APP_NAME to be

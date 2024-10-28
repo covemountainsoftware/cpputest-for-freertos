@@ -40,9 +40,18 @@ extern "C" QueueHandle_t xQueueGenericCreate(const UBaseType_t queueLength,
     return queue;
 }
 
+namespace cms{
+    namespace test {
+        extern void MutexAboutToDelete(QueueHandle_t mutex);
+    }
+}
 extern "C" void vQueueDelete(QueueHandle_t queue)
 {
     configASSERT(queue != nullptr);
+    if (queue->queueType == queueQUEUE_TYPE_MUTEX)
+    {
+        cms::test::MutexAboutToDelete(queue);
+    }
     delete queue;
 }
 
