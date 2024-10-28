@@ -22,8 +22,8 @@
 /// @endcond
 #include "FreeRTOS.h"
 #include "task.h"
-#include "cpputest_freertos_timers.hpp"
-#include "cpputest_freertos_task.hpp"
+#include "cpputest_for_freertos_timers.hpp"
+#include "cpputest_for_freertos_task.hpp"
 #include "CppUTest/TestHarness.h"
 
 TEST_GROUP(TaskTests)

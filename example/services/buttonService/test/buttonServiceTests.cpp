@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include "buttonService.h"
-#include "cpputest_freertos_task.hpp"
+#include "cpputest_for_freertos_lib.hpp"
 #include "mockButtonReader.hpp"
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
@@ -37,7 +37,7 @@ TEST_GROUP(HwLockCtrlServiceTests) {
     uint8_t testContextObject = 1;
 
     void setup() final {
-        cms::test::TaskInit();
+        cms::test::LibInitAll();
         mock("ButtonReader").expectOneCall("Init");
         ButtonService_Init();
         ButtonService_Start(EXECUTION_OPTION_UNIT_TEST);
@@ -55,12 +55,12 @@ TEST_GROUP(HwLockCtrlServiceTests) {
     void teardown() final {
         ButtonService_Destroy(); //ensure we are stopped/clean/destroyed.
         mock().clear();
-        cms::test::TaskDestroy();
+        cms::test::LibTeardownAll();
     }
 
     static void GiveProcessingTime() {
         //use our unit testing backdoor to service
-        //the active object's internal queue. This avoids threading issues
+        //the active object's internal semaphore. This avoids threading issues
         //with unit tests, creating 100% predictable unit tests.
         while (ButtonService_ProcessOneEvent(EXECUTION_OPTION_UNIT_TEST)) {}
     }

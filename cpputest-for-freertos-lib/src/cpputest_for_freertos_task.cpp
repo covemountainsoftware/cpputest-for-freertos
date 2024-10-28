@@ -28,7 +28,7 @@
 /// @endcond
 #include "FreeRTOS.h"
 #include "task.h"
-#include "cpputest_freertos_timers.hpp"
+#include "cpputest_for_freertos_timers.hpp"
 
 namespace cms {
 namespace test {

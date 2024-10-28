@@ -22,7 +22,7 @@
 /// @endcond
 #include "FreeRTOS.h"
 #include "timers.h"
-#include "cpputest_freertos_timers.hpp"
+#include "cpputest_for_freertos_timers.hpp"
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 

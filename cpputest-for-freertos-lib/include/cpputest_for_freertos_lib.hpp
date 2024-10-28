@@ -1,4 +1,4 @@
-/// @brief Support methods to help with unit testing for FreeRTOS configASSERT.
+/// @brief Top level init/teardown methods for CppUTest for FreeRTOS library.
 /// @ingroup
 /// @cond
 ///***************************************************************************
@@ -21,28 +21,34 @@
 ///***************************************************************************
 /// @endcond
 
-#ifndef CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FREERTOS_ASSERT_HPP
-#define CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FREERTOS_ASSERT_HPP
+#ifndef CPPUTEST_FOR_FREERTOS_LIB_HPP
+#define CPPUTEST_FOR_FREERTOS_LIB_HPP
 
-#include "FreeRTOS.h"
-#include "CppUTestExt/MockSupport.h"
+#include "cpputest_for_freertos_assert.hpp"
+#include "cpputest_for_freertos_task.hpp"
+#include "cpputest_for_freertos_timers.hpp"
 
 namespace cms {
     namespace test {
-
-        void AssertOutputEnable();
-        void AssertOutputDisable();
-
-        static constexpr const char* ASSERT_MOCK_NAME  = "ASSERT";
-        static constexpr const char* ON_ASSERT_FUNC_NAME  = "cmsAssertCalled";
-
-        inline void MockExpectAssert()
-        {
-            mock(ASSERT_MOCK_NAME)
-                    .expectOneCall(ON_ASSERT_FUNC_NAME)
-                    .ignoreOtherParameters();
+        /**
+         * call this in your unit test setup() method to initialize
+         * all available CppUTest for FreeRTOS modules.
+         */
+        void LibInitAll() {
+            TaskInit();
+            AssertOutputEnable();
+            TimersInit();
         }
-    }   // namespace test
-}   // namespace cms
 
-#endif //CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FREERTOS_ASSERT_HPP
+        /**
+         * call this in your unit test teardown() method to correctly
+         * destroy/teardown all available CppUTest for FreeRTOS modules.
+         */
+        void LibTeardownAll() {
+            TimersDestroy();
+            TaskDestroy();
+        }
+    } // namespace test
+} //namespace cms
+
+#endif //CPPUTEST_FOR_FREERTOS_LIB_HPP

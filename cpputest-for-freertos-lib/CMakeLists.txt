@@ -36,12 +36,13 @@ include_directories(include)
 set(FREERTOS_KERNEL_PATH ${CMS_FREERTOS_KERNEL_TOP_DIR} CACHE INTERNAL "")
 
 add_library(cpputest-for-freertos-lib
-        src/cpputest_freertos_task.cpp
-        src/cpputest_freertos_queue.cpp
-        src/cpputest_freertos_assert.cpp
-        src/cpputest_freertos_timers.cpp
+        src/cpputest_for_freertos_task.cpp
+        src/cpputest_for_freertos_queue.cpp
+        src/cpputest_for_freertos_assert.cpp
+        src/cpputest_for_freertos_timers.cpp
         src/cpputest_main.cpp
-        src/cpputest_freertos_semaphore.cpp
+        src/cpputest_for_freertos_semaphore.cpp
+        include/cpputest_for_freertos_lib.hpp
 )
 
 add_subdirectory(tests)

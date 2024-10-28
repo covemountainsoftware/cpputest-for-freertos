@@ -22,9 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "hwLockCtrlService.h"
-#include "cpputest_freertos_timers.hpp"
-#include "cpputest_freertos_assert.hpp"
-#include "cpputest_freertos_task.hpp"
+#include "cpputest_for_freertos_lib.hpp"
 #include "CppUTest/TestHarness.h"
 #include "CppUTestExt/MockSupport.h"
 #include "hwLockCtrl.h"
@@ -61,8 +59,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
 {
     void setup() final
     {
-        cms::test::TaskInit();
-        cms::test::TimersInit();
+        cms::test::LibInitAll();
         HLCS_Init();
         HLCS_RegisterChangeStateCallback(TestLockStateCallback);
         HLCS_RegisterSelfTestResultCallback(TestSelfTestResultCallback);
@@ -72,19 +69,18 @@ TEST_GROUP(HwLockCtrlServiceTests)
     {
         HLCS_Destroy(); //ensure we are stopped/clean/destroyed.
         mock().clear();
-        cms::test::TimersDestroy();
-        cms::test::TaskDestroy();
+        cms::test::LibTeardownAll();
     }
 
-    void GiveProcessingTime()
+    static void GiveProcessingTime()
     {
         //use our unit testing backdoor to service
         //the active object's internal queue. This avoids threading issues
         //with unit tests, creating 100% predictable unit tests.
-        while (true == HLCS_ProcessOneEvent(EXECUTION_OPTION_UNIT_TEST)) {}
+        while (HLCS_ProcessOneEvent(EXECUTION_OPTION_UNIT_TEST)) {}
     }
 
-    void StartServiceToLocked()
+    static void StartServiceToLocked()
     {
         mock(HW_LOCK_CTRL_MOCK).expectOneCall("Init");
         mock(HW_LOCK_CTRL_MOCK).expectOneCall("Lock");
@@ -95,7 +91,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
         CHECK_TRUE(HLCS_LOCK_STATE_LOCKED == HLCS_GetState());
     }
 
-    void TestUnlock()
+    static void TestUnlock()
     {
         mock(HW_LOCK_CTRL_MOCK).expectOneCall("Unlock");
         mock(CB_MOCK).expectOneCall("LockStateCallback").withIntParameter("state", static_cast<int>(HLCS_LOCK_STATE_UNLOCKED));
@@ -105,7 +101,7 @@ TEST_GROUP(HwLockCtrlServiceTests)
         CHECK_TRUE(HLCS_LOCK_STATE_UNLOCKED == HLCS_GetState());
     }
 
-    void StartServiceToUnlocked()
+    static void StartServiceToUnlocked()
     {
         mock(HW_LOCK_CTRL_MOCK).expectOneCall("Init");
         mock(HW_LOCK_CTRL_MOCK).expectOneCall("Lock");

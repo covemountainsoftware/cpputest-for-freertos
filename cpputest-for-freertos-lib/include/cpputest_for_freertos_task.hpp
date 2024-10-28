@@ -1,4 +1,5 @@
-/// @brief Tests of support methods to help with unit testing for FreeRTOS configASSERT.
+/// @brief Support methods to help with unit testing for FreeRTOS task
+///        related methods.
 /// @ingroup
 /// @cond
 ///***************************************************************************
@@ -20,25 +21,24 @@
 ///   info@covemountainsoftware.com
 ///***************************************************************************
 /// @endcond
-#include "CppUTest/TestHarness.h"
-#include "cpputest_for_freertos_assert.hpp"
+#ifndef CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FOR_FREERTOS_TASK_HPP
+#define CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FOR_FREERTOS_TASK_HPP
 
-TEST_GROUP(AssertTests)
-{
-    void setup() final
-    {
+namespace cms {
+    namespace test {
+
+        /**
+         * Init, prepare for task related usage, primarily for time
+         * related tracking.
+         */
+        void TaskInit();
+
+        /**
+         * Clean up/destroy the fake CppUTest for task details, primarily
+         * related to time.
+         */
+        void TaskDestroy();
     }
-
-    void teardown() final
-    {
-        mock().clear();
-    }
-};
-
-TEST(AssertTests, configASSERT_results_in_expected_mock_hit_and_proper_test_exit)
-{
-    cms::test::AssertOutputDisable();
-    cms::test::MockExpectAssert();
-    configASSERT(true == false);
-    mock().checkExpectations();
 }
+
+#endif //CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FOR_FREERTOS_TASK_HPP

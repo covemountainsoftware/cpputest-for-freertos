@@ -24,7 +24,7 @@
 ///***************************************************************************
 /// @endcond
 
-#include "cpputest_freertos_fake_queue.hpp"
+#include "cpputest_for_freertos_fake_queue.hpp"
 #include <cstring>
 #include "FreeRTOS.h"
 #include "queue.h"

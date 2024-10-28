@@ -1,5 +1,4 @@
-/// @brief Support methods to help with unit testing for FreeRTOS task
-///        related methods.
+/// @brief Support methods to help with unit testing for FreeRTOS configASSERT.
 /// @ingroup
 /// @cond
 ///***************************************************************************
@@ -21,24 +20,29 @@
 ///   info@covemountainsoftware.com
 ///***************************************************************************
 /// @endcond
-#ifndef CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FREERTOS_TASK_HPP
-#define CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FREERTOS_TASK_HPP
+
+#ifndef CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FOR_FREERTOS_ASSERT_HPP
+#define CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FOR_FREERTOS_ASSERT_HPP
+
+#include "FreeRTOS.h"
+#include "CppUTestExt/MockSupport.h"
 
 namespace cms {
     namespace test {
 
-        /**
-         * Init, prepare for task related usage, primarily for time
-         * related tracking.
-         */
-        void TaskInit();
+        void AssertOutputEnable();
+        void AssertOutputDisable();
 
-        /**
-         * Clean up/destroy the fake CppUTest for task details, primarily
-         * related to time.
-         */
-        void TaskDestroy();
-    }
-}
+        static constexpr const char* ASSERT_MOCK_NAME  = "ASSERT";
+        static constexpr const char* ON_ASSERT_FUNC_NAME  = "cmsAssertCalled";
 
-#endif //CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FREERTOS_TASK_HPP
+        inline void MockExpectAssert()
+        {
+            mock(ASSERT_MOCK_NAME)
+                    .expectOneCall(ON_ASSERT_FUNC_NAME)
+                    .ignoreOtherParameters();
+        }
+    }   // namespace test
+}   // namespace cms
+
+#endif //CPPUTEST_FOR_FREERTOS_LIB_CPPUTEST_FOR_FREERTOS_ASSERT_HPP

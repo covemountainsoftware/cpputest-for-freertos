@@ -22,7 +22,7 @@
 /// @endcond
 
 #include <cstdio>
-#include "cpputest_freertos_assert.hpp"
+#include "cpputest_for_freertos_assert.hpp"
 
 static bool m_printAssert = true;
 
