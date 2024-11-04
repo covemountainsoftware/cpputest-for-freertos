@@ -56,8 +56,8 @@ do not block in any manner.
 ## Timers
 
 The library provides fake but functional FreeRTOS compatible software timers.
-Accessor methods are provided to allow the unit tests to "move time forward"
-triggers timers to fire as expected.
+Accessor methods are provided allowing unit tests to "move time forward,"
+triggering FreeRTOS timers to fire as expected.
 
 ## ASSERT
 
