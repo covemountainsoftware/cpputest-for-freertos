@@ -9,14 +9,18 @@ To learn more about Matthew, see here: https://covemountainsoftware.com/services
 # Introduction
 
 CppUTest for FreeRTOS is a host PC based unit testing library supporting
-the unit testing of FreeRTOS based code.
+the unit testing of well-formed FreeRTOS based code. Fundamentally it provides
+various FreeRTOS functions as non-functional linking only replacements OR 'fakes'
+that provide equivalent functionality (especially see timers).
 
-At this time, the library is proven for firmware following an event driven 
-active object pattern, i.e. threads that sit on a queue and process one event 
-at a time. Other patterns may be possible too, as long as the module under test
-does not mix blocking operating system calls within a function being tested. See
-the provided example which provides a back-door for processing a single event,
-which in-turn enables host PC based unit testing.
+What do I mean by well-formed? Well-formed in this context means a thread or 
+module with only a single thread blocking mechanism (queue or semaphore, for example)
+which in turn, when unblocked, activates the thread's behavior.
+A well-known example would be an [active object](https://covemountainsoftware.com/2021/04/20/what-is-an-active-object/).
+
+Frankly, a firmware's threads should be well-formed. Like many others, 
+I consider the mixing of RTOS blocking and locking mechanism's to be
+a recipe for a bad-cake, if not disaster.
 
 # Environment
 
@@ -33,9 +37,9 @@ be compatible with this code.
 
 ## Continuous Integration
 
-This project has configured GitHub Actions to build and execute all
-unit tests found in this project. This is an example
-of one of the key benefits of host-based testing of embedded software.
+This project uses GitHub Actions to build and execute all
+unit tests found in this project. This is an example of one of the 
+key benefits of host-based testing of embedded software.
 
 See the configuration at: `.github/workflows/cmake.yml`
 
