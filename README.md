@@ -43,7 +43,32 @@ key benefits of host-based testing of embedded software.
 
 See the configuration at: `.github/workflows/cmake.yml`
 
-# Testing Support
+# Examples
+
+## Button Service
+
+The button service is effectively an active object style FreeRTOS service (thread)
+which blocks exclusively on a semaphore. It is provided as an example of
+how to use this library to unit test a thread that pends on a semaphore.
+
+See `example/services/buttonService/test` for the associated unit tests.
+
+## Hw Lock Ctrl Service
+
+The Hw Lock Ctrl Service is a traditional active object FreeRTOS service (thread)
+which blocks exclusively on a queue. It is provided as an example of 
+how to use this library to unit test an active object thread.
+
+See `example/services/hwLockCtrlService/test` for the associated unit tests.
+
+## demoPcApp
+
+A POSIX port FreeRTOS demonstration app interacting with the example services in a 
+real FreeRTOS environment.
+
+See `example\apps\demoPcApp`.
+
+# FreeRTOS Support
 
 ## Tasks
 
