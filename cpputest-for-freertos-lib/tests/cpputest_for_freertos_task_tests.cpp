@@ -59,3 +59,38 @@ TEST(TaskTests, task_delay_method_will_move_timers_time_forward_if_timers_are_ac
     CHECK_TRUE(std::chrono::milliseconds(pdTICKS_TO_MS(100)) == fromTimers);
     cms::test::TimersDestroy();
 }
+
+TEST(TaskTests, task_delay_until_method_is_available)
+{
+    auto lastWakeTime = xTaskGetTickCount();
+    auto count1 = lastWakeTime;
+    vTaskDelayUntil(&lastWakeTime, 10);
+    auto count2 = xTaskGetTickCount();
+    CHECK_EQUAL(10, count2 - count1);
+}
+
+TEST(TaskTests, task_delay_until_method_returns_false_if_next_is_already_happened)
+{
+    auto lastWakeTime = xTaskGetTickCount();
+
+    //simulate a task switch which means the next delay until deadline has passed
+    vTaskDelay(11);
+
+    auto didSleep = xTaskDelayUntil(&lastWakeTime, 10);
+    CHECK_EQUAL(pdFALSE, didSleep);
+}
+
+TEST(TaskTests, task_delay_until_method_returns_true_if_sleep_was_needed)
+{
+    auto lastWakeTime = xTaskGetTickCount();
+    auto count1 = lastWakeTime;
+
+    //simulate a brief task switch, but the next deadline is still in the future
+    vTaskDelay(3);
+
+    auto didSleep = xTaskDelayUntil(&lastWakeTime, 10);
+    CHECK_EQUAL(pdTRUE, didSleep);
+
+    auto count2 = xTaskGetTickCount();
+    CHECK_EQUAL(10, count2 - count1);
+}

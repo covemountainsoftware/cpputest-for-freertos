@@ -95,3 +95,17 @@ extern "C" TickType_t xTaskGetTickCount(void)
         return cms::test::s_tickCount;
     }
 }
+
+extern "C" BaseType_t xTaskDelayUntil(TickType_t * const previous, const TickType_t increment)
+{
+    configASSERT(previous != nullptr);
+    auto current = xTaskGetTickCount();
+    auto next = *previous + increment;
+    if (next <= current)
+    {
+        return pdFALSE;
+    }
+
+    vTaskDelay(next - current);
+    return pdTRUE;
+}
