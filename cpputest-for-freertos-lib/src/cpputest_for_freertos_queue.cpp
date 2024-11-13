@@ -150,3 +150,17 @@ extern "C" BaseType_t xQueuePeek(QueueHandle_t queue, void * const buffer, TickT
         return pdFALSE;
     }
 }
+
+QueueHandle_t xQueueGenericCreateStatic(const UBaseType_t queueLength,
+                                        const UBaseType_t itemSize,
+                                        uint8_t * queueStorage,
+                                        StaticQueue_t * staticQueue,
+                                        const uint8_t queueType)
+{
+    //for unit testing, just going to ignore the provided static queue and allocate
+    //dynamically.
+    (void)queueStorage;
+    (void)staticQueue;
+    auto queue = xQueueGenericCreate(queueLength, itemSize, queueType);
+    return queue;
+}

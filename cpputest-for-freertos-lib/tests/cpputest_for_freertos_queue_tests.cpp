@@ -147,7 +147,6 @@ TEST(QueueTests, messages_waiting_works_as_expected)
     CHECK_EQUAL(2, count);
 }
 
-
 TEST(QueueTests, spaces_available_works_as_expected)
 {
     const TestEventT event = { 23, 43 };
@@ -166,4 +165,12 @@ TEST(QueueTests, spaces_available_works_as_expected)
 
     count = uxQueueSpacesAvailable(mQueueUnderTest);
     CHECK_EQUAL(1, count);
+}
+
+TEST(QueueTests, can_create_a_static_queue)
+{
+    static StaticQueue_t staticQueue;
+    uint8_t queueStorageArea[ 2 * sizeof(TestEventT) ];
+    mQueueUnderTest = xQueueCreateStatic(2, sizeof(TestEventT), queueStorageArea, &staticQueue);
+    CHECK_TRUE(mQueueUnderTest != nullptr);
 }
