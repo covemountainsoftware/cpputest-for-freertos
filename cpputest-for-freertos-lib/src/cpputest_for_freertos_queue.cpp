@@ -108,8 +108,11 @@ extern "C" BaseType_t xQueueGenericSend(QueueHandle_t queue,
 {
     (void)ticks;
     configASSERT(queue != nullptr);
+    configASSERT(!((itemToQueue == nullptr) && (queue->itemSize != 0U)));
+    configASSERT(!((copyPosition == queueOVERWRITE) && (queue->queueLength != 1)));
 
-    if (queue->queue.size() >= queue->queueLength)
+    if ((copyPosition != queueOVERWRITE) &&
+        (queue->queue.size() >= queue->queueLength))
     {
         return errQUEUE_FULL;
     }
@@ -124,6 +127,11 @@ extern "C" BaseType_t xQueueGenericSend(QueueHandle_t queue,
     }
     else if (copyPosition == queueSEND_TO_FRONT)
     {
+        queue->queue.push_front(msg);
+    }
+    else if (copyPosition == queueOVERWRITE)
+    {
+        queue->queue.pop_front();
         queue->queue.push_front(msg);
     }
     else

@@ -174,3 +174,23 @@ TEST(QueueTests, can_create_a_static_queue)
     mQueueUnderTest = xQueueCreateStatic(2, sizeof(TestEventT), queueStorageArea, &staticQueue);
     CHECK_TRUE(mQueueUnderTest != nullptr);
 }
+
+TEST(QueueTests, can_use_queue_overwrite)
+{
+    const TestEventT firstEvent = { 23, 43 };
+    const TestEventT overwriteEvent = { 123, 143 };
+
+    CreateUnderTest(1, sizeof(TestEventT));
+
+    auto rtn = xQueueSendToBack(mQueueUnderTest, &firstEvent, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+
+    rtn = xQueueOverwrite(mQueueUnderTest, &overwriteEvent);
+    CHECK_EQUAL(pdPASS, rtn);
+
+    TestEventT retrieved;
+    rtn = xQueueReceive(mQueueUnderTest, &retrieved, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+    CHECK_EQUAL(overwriteEvent.valueA, retrieved.valueA);
+    CHECK_EQUAL(overwriteEvent.valueB, retrieved.valueB);
+}
