@@ -94,3 +94,26 @@ TEST(TaskTests, task_delay_until_method_returns_true_if_sleep_was_needed)
     auto count2 = xTaskGetTickCount();
     CHECK_EQUAL(10, count2 - count1);
 }
+
+static void staticTaskCode(void * parameters)
+{
+    (void)parameters;
+    //for testing, does nothing
+}
+
+TEST(TaskTests, task_create_static_is_available)
+{
+    static StaticTask_t staticTaskBuffer;
+    static std::array<StackType_t, 200> staticStack;
+
+    auto taskHandle = xTaskCreateStatic(
+            staticTaskCode,       /* Function that implements the task. */
+            "TEST",          /* Text name for the task. */
+            staticStack.size(),      /* Number of indexes in the xStack array. */
+            ( void * ) 1,    /* Parameter passed into the task. */
+            tskIDLE_PRIORITY,/* Priority at which the task is created. */
+            staticStack.data(),          /* Array to use as the task's stack. */
+            &staticTaskBuffer );  /* Variable to hold the task's data structure. */
+
+    CHECK_TRUE(taskHandle != nullptr);
+}
