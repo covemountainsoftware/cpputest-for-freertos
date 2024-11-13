@@ -172,3 +172,22 @@ QueueHandle_t xQueueGenericCreateStatic(const UBaseType_t queueLength,
     auto queue = xQueueGenericCreate(queueLength, itemSize, queueType);
     return queue;
 }
+
+void vQueueAddToRegistry(QueueHandle_t queue, const char * queueName)
+{
+    configASSERT(queue != nullptr);
+    configASSERT(queueName != nullptr);
+    queue->registryName = queueName;
+}
+
+const char * pcQueueGetName(QueueHandle_t queue)
+{
+    configASSERT(queue != nullptr);
+    return queue->registryName;
+}
+
+void vQueueUnregisterQueue(QueueHandle_t queue)
+{
+    configASSERT(queue != nullptr);
+    queue->registryName = nullptr;
+}

@@ -13,6 +13,7 @@ typedef struct QueueDefinition
     uint8_t queueType = {};
     std::deque<std::vector<uint8_t>> queue = {};
     uint64_t recursiveCallCount = {};
+    const char * registryName = nullptr;
 } FakeQueue;
 
 namespace cms {

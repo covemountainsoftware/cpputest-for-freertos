@@ -109,7 +109,12 @@
 /* configQUEUE_REGISTRY_SIZE sets the maximum number of queues and semaphores
  * that can be referenced from the queue registry.  Only required when using a
  * kernel aware debugger.  Defaults to 0 if left undefined. */
-#define configQUEUE_REGISTRY_SIZE                  0
+
+//CMS: no actual bounds, provided for compatibility, no
+//     actual kernel aware debugger is applicable to
+//     cpputest-for-freertos. Just use your favorite
+//     debugger while unit testing!
+#define configQUEUE_REGISTRY_SIZE                  1000
 
 /* Set configENABLE_BACKWARD_COMPATIBILITY to 1 to map function names and
  * datatypes from old version of FreeRTOS to their latest equivalent.  Defaults to

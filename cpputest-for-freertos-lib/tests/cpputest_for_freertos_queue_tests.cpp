@@ -194,3 +194,26 @@ TEST(QueueTests, can_use_queue_overwrite)
     CHECK_EQUAL(overwriteEvent.valueA, retrieved.valueA);
     CHECK_EQUAL(overwriteEvent.valueB, retrieved.valueB);
 }
+
+TEST(QueueTests, can_add_queue_to_registry)
+{
+    static const char * TEST_QUEUE_NAME = "This is a test";
+    CreateUnderTest(1, sizeof(TestEventT));
+    vQueueAddToRegistry(mQueueUnderTest, TEST_QUEUE_NAME);
+
+    auto result = pcQueueGetName(mQueueUnderTest);
+    CHECK_EQUAL(TEST_QUEUE_NAME, result);
+}
+
+TEST(QueueTests, can_unregister_queue)
+{
+    static const char * TEST_QUEUE_NAME = "This is another test";
+    CreateUnderTest(1, sizeof(TestEventT));
+    vQueueAddToRegistry(mQueueUnderTest, TEST_QUEUE_NAME);
+    auto result = pcQueueGetName(mQueueUnderTest);
+    CHECK_EQUAL(TEST_QUEUE_NAME, result);
+
+    vQueueUnregisterQueue(mQueueUnderTest);
+    result = pcQueueGetName(mQueueUnderTest);
+    CHECK_EQUAL(nullptr, result);
+}
