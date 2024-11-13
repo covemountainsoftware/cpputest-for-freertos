@@ -159,7 +159,7 @@ extern "C" BaseType_t xQueuePeek(QueueHandle_t queue, void * const buffer, TickT
     }
 }
 
-QueueHandle_t xQueueGenericCreateStatic(const UBaseType_t queueLength,
+extern "C" QueueHandle_t xQueueGenericCreateStatic(const UBaseType_t queueLength,
                                         const UBaseType_t itemSize,
                                         uint8_t * queueStorage,
                                         StaticQueue_t * staticQueue,
@@ -173,20 +173,20 @@ QueueHandle_t xQueueGenericCreateStatic(const UBaseType_t queueLength,
     return queue;
 }
 
-void vQueueAddToRegistry(QueueHandle_t queue, const char * queueName)
+extern "C" void vQueueAddToRegistry(QueueHandle_t queue, const char * queueName)
 {
     configASSERT(queue != nullptr);
     configASSERT(queueName != nullptr);
     queue->registryName = queueName;
 }
 
-const char * pcQueueGetName(QueueHandle_t queue)
+extern "C" const char * pcQueueGetName(QueueHandle_t queue)
 {
     configASSERT(queue != nullptr);
     return queue->registryName;
 }
 
-void vQueueUnregisterQueue(QueueHandle_t queue)
+extern "C" void vQueueUnregisterQueue(QueueHandle_t queue)
 {
     configASSERT(queue != nullptr);
     queue->registryName = nullptr;
