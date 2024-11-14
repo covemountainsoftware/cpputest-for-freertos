@@ -148,4 +148,48 @@ TEST(QueueSetTests, select_from_set_will_return_expected_queue_with_event)
     rtn = xQueueReceive(selectResult, &receivedValue, portMAX_DELAY);
     CHECK_EQUAL(pdTRUE, rtn);
     CHECK_EQUAL(testValue, receivedValue);
+
+    //confirm select shows null now
+    selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(nullptr, selectResult);
+}
+
+TEST(QueueSetTests, select_from_set_with_multiple_queues_will_return_expected_queues_in_expected_order)
+{
+    const uint16_t testValueQueue1 = 4321; //queue1: 16bit
+    const int32_t testValueQueue2 = 9876;  //queue2: 32bit
+
+    CreateSetUnderTest(4);
+    auto queue1 = CreateQueueAndAddToUnderTestSet(2, sizeof(testValueQueue1));
+    auto queue2 = CreateQueueAndAddToUnderTestSet(2, sizeof(testValueQueue2));
+
+    //send via queue2, then queue1
+    auto rtn = xQueueSendToBack(queue2.get(), &testValueQueue2, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+    rtn = xQueueSendToBack(queue1.get(), &testValueQueue1, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+
+    auto selectResultFirst = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_TRUE(selectResultFirst != nullptr);
+    CHECK_EQUAL(queue2.get(), selectResultFirst);
+
+    auto selectResultSecond = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_TRUE(selectResultSecond != nullptr);
+    CHECK_EQUAL(queue1.get(), selectResultSecond);
+
+    //go ahead and confirm queue2 is as expected
+    int32_t receivedIntValue = 0;
+    rtn = xQueueReceive(selectResultFirst, &receivedIntValue, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+    CHECK_EQUAL(testValueQueue2, receivedIntValue);
+
+    //go ahead and confirm queue1 is as expected
+    uint16_t receivedShortValue = 0;
+    rtn = xQueueReceive(selectResultSecond, &receivedShortValue, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+    CHECK_EQUAL(testValueQueue1, receivedShortValue);
+
+    //confirm select shows null now
+    auto selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(nullptr, selectResult);
 }
