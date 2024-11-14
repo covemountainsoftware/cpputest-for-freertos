@@ -32,7 +32,7 @@ SOFTWARE.
 static const uint16_t ON_OFF_BIT = 0x02;
 static const uint16_t FUNC_A_BIT = 0x08;
 
-TEST_GROUP(HwLockCtrlServiceTests) {
+TEST_GROUP(ButtonServiceTests) {
 
     uint8_t testContextObject = 1;
 
@@ -76,12 +76,12 @@ TEST_GROUP(HwLockCtrlServiceTests) {
     }
 };
 
-TEST(HwLockCtrlServiceTests, given_startup_when_created_then_does_not_crash)
+TEST(ButtonServiceTests, given_startup_when_created_then_does_not_crash)
 {
     //setup() is called by cpputest, which inits AND starts our unit under test.
 }
 
-TEST(HwLockCtrlServiceTests, given_button_isr_then_reads_button_status)
+TEST(ButtonServiceTests, given_button_isr_then_reads_button_status)
 {
     mock("ButtonReader").expectOneCall("Read").ignoreOtherParameters();
     cms::test::mock::ButtonReaderDoIsr();
@@ -89,7 +89,7 @@ TEST(HwLockCtrlServiceTests, given_button_isr_then_reads_button_status)
     mock().checkExpectations();
 }
 
-TEST(HwLockCtrlServiceTests, given_button_isr_and_registered_callback_then_reads_button_status_and_executes_service_callback)
+TEST(ButtonServiceTests, given_button_isr_and_registered_callback_then_reads_button_status_and_executes_service_callback)
 {
     mock("TEST").expectOneCall("Callback")
        .withParameter("flags", BUTTON_ON_OFF)
@@ -101,7 +101,7 @@ TEST(HwLockCtrlServiceTests, given_button_isr_and_registered_callback_then_reads
     mock().checkExpectations();
 }
 
-TEST(HwLockCtrlServiceTests, given_button_isr_and_registered_callback_then_callback_provides_correct_context)
+TEST(ButtonServiceTests, given_button_isr_and_registered_callback_then_callback_provides_correct_context)
 {
     mock("TEST").expectOneCall("Callback")
             .withParameter("context", (void*)&testContextObject)
@@ -112,7 +112,7 @@ TEST(HwLockCtrlServiceTests, given_button_isr_and_registered_callback_then_callb
     mock().checkExpectations();
 }
 
-TEST(HwLockCtrlServiceTests, given_button_released_and_then_callback_is_released_only)
+TEST(ButtonServiceTests, given_button_released_and_then_callback_is_released_only)
 {
     mock("TEST").expectOneCall("Callback")
             .withParameter("state", BUTTON_RELEASED)
@@ -122,7 +122,7 @@ TEST(HwLockCtrlServiceTests, given_button_released_and_then_callback_is_released
     mock().checkExpectations();
 }
 
-TEST(HwLockCtrlServiceTests, given_button_released_and_pressed_then_two_callbacks)
+TEST(ButtonServiceTests, given_button_released_and_pressed_then_two_callbacks)
 {
     mock("TEST").expectOneCall("Callback")
             .withParameter("state", BUTTON_PRESSED)
@@ -138,7 +138,7 @@ TEST(HwLockCtrlServiceTests, given_button_released_and_pressed_then_two_callback
     mock().checkExpectations();
 }
 
-TEST(HwLockCtrlServiceTests, given_garbage_button_read_then_callback_is_not_executed)
+TEST(ButtonServiceTests, given_garbage_button_read_then_callback_is_not_executed)
 {
     mock("TEST").expectNoCall("Callback");
     DoButtonIsr(1, 1);
