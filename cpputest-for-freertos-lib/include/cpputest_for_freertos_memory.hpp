@@ -44,6 +44,8 @@ namespace cms {
         };
 
         using unique_queue = std::unique_ptr<struct QueueDefinition, FreeRTOSQueueDeleter>;
+        using unique_sema = std::unique_ptr<struct QueueDefinition, FreeRTOSQueueDeleter>;
+
     } //namespace test
 } //namespace cms
 
