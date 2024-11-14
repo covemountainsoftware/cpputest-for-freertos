@@ -82,6 +82,15 @@ threading behavior itself.
 The library provides fake but functional FreeRTOS compatible queues. The queues
 do not block in any manner.
 
+## Queue Sets
+
+The library provides fake but functional FreeRTOS compatible queue sets. 
+The queues sets do not block in any manner and operate as expected with 
+queues and semaphores. NOTE: provided for projects that may have a 
+real need for this FreeRTOS feature. However, FreeRTOS is not encouraging
+this feature and neither would I encourage the use of this feature. Too 
+many caveats and potential maintenance issues.
+
 ## Timers
 
 The library provides fake but functional FreeRTOS compatible software timers.
