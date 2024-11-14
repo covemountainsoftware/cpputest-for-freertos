@@ -23,6 +23,7 @@
 
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "semphr.h"
 #include "cpputest_for_freertos_memory.hpp"
 
 //must be last
@@ -192,4 +193,54 @@ TEST(QueueSetTests, select_from_set_with_multiple_queues_will_return_expected_qu
     //confirm select shows null now
     auto selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
     CHECK_EQUAL(nullptr, selectResult);
+}
+
+TEST(QueueSetTests, select_from_set_will_return_expected_semaphore)
+{
+    CreateSetUnderTest(2);
+    cms::test::unique_sema sema (xSemaphoreCreateBinary());
+    CHECK_TRUE(sema != nullptr);
+
+    auto rtn = xQueueAddToSet(sema.get(), mUnderTest.get());
+    CHECK_EQUAL(pdPASS, rtn);
+
+    auto selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(nullptr, selectResult);
+
+    xSemaphoreGive(sema.get());
+
+    selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(sema.get(), selectResult);
+
+    auto count = uxSemaphoreGetCount(selectResult);
+    CHECK_EQUAL(1, count);
+}
+
+TEST(QueueSetTests, select_from_set_with_multiple_semaphores_will_return_expected_semaphore_in_expected_order)
+{
+    CreateSetUnderTest(2);
+    cms::test::unique_sema sema1 (xSemaphoreCreateBinary());
+    CHECK_TRUE(sema1 != nullptr);
+    cms::test::unique_sema sema2 (xSemaphoreCreateBinary());
+    CHECK_TRUE(sema2 != nullptr);
+    auto rtn = xQueueAddToSet(sema1.get(), mUnderTest.get());
+    CHECK_EQUAL(pdPASS, rtn);
+    rtn = xQueueAddToSet(sema2.get(), mUnderTest.get());
+    CHECK_EQUAL(pdPASS, rtn);
+
+    auto selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(nullptr, selectResult);
+
+    xSemaphoreGive(sema2.get());
+    xSemaphoreGive(sema1.get());
+
+    selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(sema2.get(), selectResult);
+    auto count = uxSemaphoreGetCount(selectResult);
+    CHECK_EQUAL(1, count);
+
+    selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(sema1.get(), selectResult);
+    count = uxSemaphoreGetCount(selectResult);
+    CHECK_EQUAL(1, count);
 }
