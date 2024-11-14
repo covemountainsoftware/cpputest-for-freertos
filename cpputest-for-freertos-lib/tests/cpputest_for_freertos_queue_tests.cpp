@@ -75,7 +75,7 @@ TEST(QueueTests, posted_item_can_be_retrieved)
     auto rtn = xQueueSendToBack(mQueueUnderTest, &event, 1000);
     CHECK_EQUAL(pdTRUE, rtn);
 
-    TestEventT retrieved;
+    TestEventT retrieved = { 0, 0 };
     rtn = xQueueReceive(mQueueUnderTest, &retrieved, portMAX_DELAY);
     CHECK_EQUAL(pdTRUE, rtn);
 
@@ -112,14 +112,14 @@ TEST(QueueTests, peek_will_copy_event_as_expected)
     auto rtn = xQueueSendToBack(mQueueUnderTest, &event, 1000);
     CHECK_EQUAL(pdTRUE, rtn);
 
-    TestEventT peek;
+    TestEventT peek = { 0, 0 };
     xQueuePeek(mQueueUnderTest, &peek, 1000);
     CHECK_EQUAL(pdTRUE, rtn);
     CHECK_EQUAL(event.valueA, peek.valueA);
     CHECK_EQUAL(event.valueB, peek.valueB);
 
     //and we can still fully receive the same event
-    TestEventT retrieved;
+    TestEventT retrieved = { 0, 0 };
     rtn = xQueueReceive(mQueueUnderTest, &retrieved, portMAX_DELAY);
     CHECK_EQUAL(pdTRUE, rtn);
 
@@ -188,7 +188,7 @@ TEST(QueueTests, can_use_queue_overwrite)
     rtn = xQueueOverwrite(mQueueUnderTest, &overwriteEvent);
     CHECK_EQUAL(pdPASS, rtn);
 
-    TestEventT retrieved;
+    TestEventT retrieved= { 0, 0 };
     rtn = xQueueReceive(mQueueUnderTest, &retrieved, portMAX_DELAY);
     CHECK_EQUAL(pdTRUE, rtn);
     CHECK_EQUAL(overwriteEvent.valueA, retrieved.valueA);
