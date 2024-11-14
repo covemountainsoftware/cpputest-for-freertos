@@ -1,0 +1,151 @@
+/// @brief Tests of CppUTest for FreeRTOS queue sets.
+/// @ingroup
+/// @cond
+///***************************************************************************
+///
+/// Copyright (C) 2024 Matthew Eshleman. All rights reserved.
+///
+/// This program is open source software: you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License as published
+/// by the Free Software Foundation, either version 3 of the License, or
+/// (at your option) any later version.
+///
+/// Alternatively, upon written permission from Matthew Eshleman, this program
+/// may be distributed and modified under the terms of a Commercial
+/// License. For further details, see the Contact Information below.
+///
+/// Contact Information:
+///   Matthew Eshleman
+///   https://covemountainsoftware.com
+///   info@covemountainsoftware.com
+///***************************************************************************
+/// @endcond
+
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "cpputest_for_freertos_memory.hpp"
+
+//must be last
+#include "CppUTest/TestHarness.h"
+
+TEST_GROUP(QueueSetTests)
+{
+    cms::test::unique_queue mUnderTest = nullptr;
+
+    void setup() final
+    {
+    }
+
+    void teardown() final
+    {
+    }
+
+    void CreateSetUnderTest(UBaseType_t length)
+    {
+        auto set = xQueueCreateSet(length);
+        mUnderTest = cms::test::unique_queue(set);
+        CHECK_TRUE(mUnderTest != nullptr);
+    }
+
+    static cms::test::unique_queue CreateQueue(UBaseType_t len, UBaseType_t itemSize)
+    {
+        auto rtn = xQueueCreate(len, itemSize);
+        CHECK_TRUE(rtn != nullptr);
+        cms::test::unique_queue queue(rtn);
+        return queue;
+    }
+
+    cms::test::unique_queue CreateQueueAndAddToUnderTestSet(UBaseType_t len, UBaseType_t itemSize) const
+    {
+        auto created = xQueueCreate(len, itemSize);
+        CHECK_TRUE(created != nullptr);
+
+        auto rtn = xQueueAddToSet(created, mUnderTest.get());
+        CHECK_EQUAL(pdPASS, rtn);
+
+        cms::test::unique_queue queue(created);
+        return queue;
+    }
+};
+
+TEST(QueueSetTests, can_create_a_queue_set)
+{
+    CreateSetUnderTest(2);
+}
+
+TEST(QueueSetTests, can_add_a_queue_to_a_set_and_remove_from_set)
+{
+    CreateSetUnderTest(2);
+
+    auto queue = CreateQueue(2, 2);
+    auto rtn = xQueueAddToSet(queue.get(), mUnderTest.get());
+    CHECK_EQUAL(pdPASS, rtn);
+
+    rtn = xQueueRemoveFromSet(queue.get(), mUnderTest.get());
+    CHECK_EQUAL(pdPASS, rtn);
+}
+
+TEST(QueueSetTests, adding_a_queue_with_events_to_a_set_fails)
+{
+    const int testValue = 234;
+    CreateSetUnderTest(2);
+    auto queue = CreateQueue(2, sizeof(int));
+    auto rtn = xQueueSendToBack(queue.get(), &testValue, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+
+    rtn = xQueueAddToSet(queue.get(), mUnderTest.get());
+    CHECK_EQUAL(pdFAIL, rtn);
+}
+
+TEST(QueueSetTests, adding_a_queue_already_added_to_a_set_fails)
+{
+    CreateSetUnderTest(2);
+    auto queue = CreateQueue(2, sizeof(int));
+    auto rtn = xQueueAddToSet(queue.get(), mUnderTest.get());
+    CHECK_EQUAL(pdPASS, rtn);
+
+    //add it again should fail
+    rtn = xQueueAddToSet(queue.get(), mUnderTest.get());
+    CHECK_EQUAL(pdFAIL, rtn);
+}
+
+TEST(QueueSetTests, can_add_a_queue_to_a_set_and_fails_to_remove_from_another_set)
+{
+    CreateSetUnderTest(2);
+    cms::test::unique_queue otherSet(xQueueCreateSet(2));
+    CHECK_TRUE(otherSet != nullptr);
+
+    auto queue = CreateQueueAndAddToUnderTestSet(2, 2);
+
+    auto rtn = xQueueRemoveFromSet(queue.get(), otherSet.get());
+    CHECK_EQUAL(pdFAIL, rtn);
+}
+
+TEST(QueueSetTests, select_from_set_will_not_block_and_return_null_if_no_events)
+{
+    CreateSetUnderTest(2);
+    auto queue = CreateQueueAndAddToUnderTestSet(2, sizeof(int));
+
+    auto selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_EQUAL(nullptr, selectResult);
+}
+
+TEST(QueueSetTests, select_from_set_will_return_expected_queue_with_event)
+{
+    const uint16_t testValue = 4321;
+
+    CreateSetUnderTest(2);
+    auto queue = CreateQueueAndAddToUnderTestSet(2, sizeof(testValue));
+
+    auto rtn = xQueueSendToBack(queue.get(), &testValue, 1000);
+    CHECK_EQUAL(pdTRUE, rtn);
+
+    auto selectResult = xQueueSelectFromSet(mUnderTest.get(), portMAX_DELAY);
+    CHECK_TRUE(selectResult != nullptr);
+    CHECK_EQUAL(queue.get(), selectResult);
+
+    uint16_t receivedValue = 0;
+    rtn = xQueueReceive(selectResult, &receivedValue, portMAX_DELAY);
+    CHECK_EQUAL(pdTRUE, rtn);
+    CHECK_EQUAL(testValue, receivedValue);
+}

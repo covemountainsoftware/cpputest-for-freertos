@@ -139,6 +139,11 @@ extern "C" BaseType_t xQueueGenericSend(QueueHandle_t queue,
         configASSERT(true == false);
     }
 
+    if (queue->queueSetContainer != nullptr)
+    {
+        xQueueGenericSend(queue->queueSetContainer, &queue, ticks, queueSEND_TO_BACK);
+    }
+
     return pdTRUE;
 }
 

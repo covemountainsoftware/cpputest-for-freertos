@@ -4,6 +4,7 @@ set(TEST_SOURCES
         cpputest_for_freertos_assert_tests.cpp
         cpputest_for_freertos_timers_tests.cpp
         cpputest_for_freertos_queue_tests.cpp
+        cpputest_for_freertos_queue_set_tests.cpp
         cpputest_for_freertos_task_tests.cpp
         cpputest_for_freertos_semaphore_tests.cpp
         cpputest_for_freertos_mutex_tests.cpp
